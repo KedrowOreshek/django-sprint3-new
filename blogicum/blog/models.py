@@ -29,7 +29,7 @@ class Category(models.Model):
     )
 
     class Meta:
-        verbose_name = 'категория'          # ← строчными!
+        verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
     def __str__(self):
@@ -38,7 +38,7 @@ class Category(models.Model):
 
 class Location(models.Model):
     name = models.CharField(
-        max_length=256,                     # ← 256, не 128
+        max_length=256,
         verbose_name='Название места',
     )
     is_published = models.BooleanField(
@@ -52,7 +52,7 @@ class Location(models.Model):
     )
 
     class Meta:
-        verbose_name = 'местоположение'     # ← строчными!
+        verbose_name = 'местоположение'
         verbose_name_plural = 'Местоположения'
 
     def __str__(self):
@@ -61,14 +61,14 @@ class Location(models.Model):
 
 class Post(models.Model):
     title = models.CharField(
-        max_length=256,                     # ← 256, не 128
+        max_length=256,
         verbose_name='Заголовок',
     )
     text = models.TextField(verbose_name='Текст')
     pub_date = models.DateTimeField(
         verbose_name='Дата и время публикации',
         help_text=(
-            'Если установить дату и время в будущем — '   # ← тире, не запятая
+            'Если установить дату и время в будущем — '
             'можно делать отложенные публикации.'
         ),
     )
@@ -100,7 +100,7 @@ class Post(models.Model):
     )
 
     class Meta:
-        verbose_name = 'публикация'         # ← строчными!
+        verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
 
     def __str__(self):
