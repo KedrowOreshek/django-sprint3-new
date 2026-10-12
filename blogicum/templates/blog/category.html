@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Публикации в категории {{ category.title }}{% endblock %}
+
+{% block content %}
+  <h1>Публикации в категории {{ category.title }}</h1>
+
+  {% for post in posts %}
+    <hr>
+    <article>
+      <h2>{{ post.title }}</h2>
+      <ul>
+        <li>Место: {{ post.location.name }}</li>
+        <li>Дата: {{ post.pub_date }}</li>
+        <li>
+          Категория:
+          <a href="{% url 'blog:category_posts' post.category.slug %}">
+            {{ post.category.title }}
+          </a>
+        </li>
+      </ul>
+      <p>{{ post.text|truncatewords:10 }}</p>
+      <a href="{% url 'blog:post_detail' post.id %}">Читать полный текст</a>
+    </article>
+  {% endfor %}
+{% endblock %}
