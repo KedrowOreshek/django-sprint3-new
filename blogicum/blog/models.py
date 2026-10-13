@@ -1,23 +1,14 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 
 User = get_user_model()
 
+TITLE_MAX_LENGTH = 256
+NAME_MAX_LENGTH = 256
+SLUG_MAX_LENGTH = 50
 
-class Category(models.Model):
-    title = models.CharField(
-        max_length=256,
-        verbose_name='Заголовок',
-    )
-    description = models.TextField(verbose_name='Описание')
-    slug = models.SlugField(
-        unique=True,
-        verbose_name='Идентификатор',
-        help_text=(
-            'Идентификатор страницы для URL; разрешены символы латиницы, '
-            'цифры, дефис и подчёркивание.'
-        ),
-    )
+
+class BaseContentModel(models.Model):
     is_published = models.BooleanField(
         default=True,
         verbose_name='Опубликовано',
@@ -26,6 +17,26 @@ class Category(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Добавлено',
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Category(BaseContentModel):
+    title = models.CharField(
+        max_length=TITLE_MAX_LENGTH,
+        verbose_name='Заголовок',
+    )
+    description = models.TextField(verbose_name='Описание')
+    slug = models.SlugField(
+        max_length=SLUG_MAX_LENGTH,
+        unique=True,
+        verbose_name='Идентификатор',
+        help_text=(
+            'Идентификатор страницы для URL; разрешены символы латиницы, '
+            'цифры, дефис и подчёркивание.'
+        ),
     )
 
     class Meta:
@@ -36,19 +47,10 @@ class Category(models.Model):
         return self.title
 
 
-class Location(models.Model):
+class Location(BaseContentModel):
     name = models.CharField(
-        max_length=256,
+        max_length=NAME_MAX_LENGTH,
         verbose_name='Название места',
-    )
-    is_published = models.BooleanField(
-        default=True,
-        verbose_name='Опубликовано',
-        help_text='Снимите галочку, чтобы скрыть публикацию.',
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Добавлено',
     )
 
     class Meta:
@@ -59,9 +61,9 @@ class Location(models.Model):
         return self.name
 
 
-class Post(models.Model):
+class Post(BaseContentModel):
     title = models.CharField(
-        max_length=256,
+        max_length=TITLE_MAX_LENGTH,
         verbose_name='Заголовок',
     )
     text = models.TextField(verbose_name='Текст')
@@ -81,6 +83,7 @@ class Post(models.Model):
         Location,
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         verbose_name='Местоположение',
     )
     category = models.ForeignKey(
@@ -89,19 +92,11 @@ class Post(models.Model):
         null=True,
         verbose_name='Категория',
     )
-    is_published = models.BooleanField(
-        default=True,
-        verbose_name='Опубликовано',
-        help_text='Снимите галочку, чтобы скрыть публикацию.',
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Добавлено',
-    )
 
     class Meta:
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.title

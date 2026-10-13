@@ -4,26 +4,30 @@ from django.utils import timezone
 from .models import Category, Post
 
 
-def index(request):
-    template = 'blog/index.html'
-    posts = Post.objects.select_related(
+POSTS_ON_MAIN_PAGE = 5
+
+
+def get_published_posts():
+    return Post.objects.select_related(
         'category', 'location', 'author'
     ).filter(
         is_published=True,
         category__is_published=True,
         pub_date__lte=timezone.now(),
-    ).order_by('-pub_date')[:5]
+    )
+
+
+def index(request):
+    template = 'blog/index.html'
+    posts = get_published_posts()[:POSTS_ON_MAIN_PAGE]
     context = {'posts': posts}
     return render(request, template, context)
 
 
 def post_detail(request, pk):
     post = get_object_or_404(
-        Post.objects.select_related('category', 'location', 'author'),
+        get_published_posts(),
         pk=pk,
-        is_published=True,
-        category__is_published=True,
-        pub_date__lte=timezone.now(),
     )
     template = 'blog/detail.html'
     context = {'post': post}
@@ -36,13 +40,7 @@ def category_posts(request, category_slug):
         slug=category_slug,
         is_published=True,
     )
-    posts = Post.objects.select_related(
-        'category', 'location', 'author'
-    ).filter(
-        category=category,
-        is_published=True,
-        pub_date__lte=timezone.now(),
-    ).order_by('-pub_date')
+    posts = get_published_posts().filter(category=category)
 
     template = 'blog/category.html'
     context = {
